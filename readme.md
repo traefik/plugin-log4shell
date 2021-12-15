@@ -10,6 +10,12 @@ Related to the Log4J CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-202
 
 ### Static
 
+```bash
+--pilot.token=xxx
+--experimental.plugins.log4shell.modulename=github.com/traefik/plugin-log4shell
+--experimental.plugins.log4shell.version=v0.1.0
+```
+
 ```yaml
 pilot:
   token: xxx
