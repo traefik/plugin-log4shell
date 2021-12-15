@@ -2,7 +2,6 @@ package plugin_log4shell
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -65,7 +64,7 @@ func containsJNDI(value string) bool {
 
 	root := Parse(lower)
 
-	for _, node := range root.Values {
+	for _, node := range root.Value {
 		if containsJNDINode(node) {
 			return true
 		}
@@ -74,18 +73,16 @@ func containsJNDI(value string) bool {
 	return false
 }
 
-func containsJNDINode(node fmt.Stringer) bool {
-	v, ok := node.(*NodeExpression)
-	if !ok {
+func containsJNDINode(node *Node) bool {
+	if node.Type != Expression {
 		return false
 	}
 
-	fmt.Println(v.Key.String())
-	if strings.Contains(v.Key.String(), "jndi") {
+	if strings.Contains(node.Key.String(), "jndi") {
 		return true
 	}
 
-	for _, k := range v.Key {
+	for _, k := range node.Key {
 		if containsJNDINode(k) {
 			return true
 		}

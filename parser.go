@@ -12,6 +12,44 @@ const (
 	Separator = "SEP"
 )
 
+// Node types.
+const (
+	Expression = "EXP"
+	Text       = "TXT"
+	Root       = "ROOT"
+)
+
+// Nodes a set of nodes.
+type Nodes []*Node
+
+func (e Nodes) String() string {
+	var data string
+	for _, v := range e {
+		data += v.String()
+	}
+	return data
+}
+
+// Node a node.
+type Node struct {
+	Type string
+
+	Text  string
+	Key   Nodes
+	Value Nodes
+}
+
+func (n Node) String() string {
+	switch n.Type {
+	case Expression, Root:
+		return n.Value.String()
+	case Text:
+		return n.Text
+	default:
+		return "OOPS"
+	}
+}
+
 // Token a syntax token.
 type Token struct {
 	Type  string `json:"type,omitempty"`
@@ -23,49 +61,10 @@ func (t Token) String() string {
 	return t.Value
 }
 
-// Element a set of nodes.
-type Element []fmt.Stringer
-
-func (e Element) String() string {
-	var data string
-	for _, v := range e {
-		data += v.String()
-	}
-	return data
-}
-
-// NodeText a text node.
-type NodeText struct {
-	Text string
-}
-
-func (n NodeText) String() string {
-	return n.Text
-}
-
-// NodeExpression an expression node.
-type NodeExpression struct {
-	Key   Element
-	Value Element
-}
-
-func (n NodeExpression) String() string {
-	return n.Value.String()
-}
-
-// NodeRoot a root node.
-type NodeRoot struct {
-	Values Element
-}
-
-func (n NodeRoot) String() string {
-	return n.Values.String()
-}
-
 // Parse naively parses Log4j expression.
 // https://logging.apache.org/log4j/2.x/manual/configuration.html#PropertySubstitution
-func Parse(value string) *NodeRoot {
-	root := &NodeRoot{}
+func Parse(value string) *Node {
+	root := &Node{Type: Root}
 
 	tree(root, tokenizer(value))
 
@@ -117,25 +116,28 @@ func tokenizer(value string) []*Token {
 	return tokens
 }
 
-func tree(root fmt.Stringer, tokens []*Token) int {
+func tree(root *Node, tokens []*Token) int {
 	var sep bool
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 
 		switch token.Type {
 		case Start:
-			exp := &NodeExpression{}
+			exp := &Node{Type: Expression}
 
-			if v, ok := root.(*NodeRoot); ok {
-				v.Values = append(v.Values, exp)
-			} else if v, ok := root.(*NodeExpression); ok {
+			switch root.Type {
+			case Root:
+				root.Value = append(root.Value, exp)
+
+			case Expression:
 				if sep {
-					v.Key = append(v.Value, v.Key...)
-					v.Value = []fmt.Stringer{exp}
+					root.Key = append(root.Value, root.Key...)
+					root.Value = []*Node{exp}
 				} else {
-					v.Key = append(v.Key, exp)
+					root.Key = append(root.Key, exp)
 				}
-			} else {
+
+			default:
 				panic(fmt.Sprintf("invalid start node: %T", root))
 			}
 
@@ -150,17 +152,18 @@ func tree(root fmt.Stringer, tokens []*Token) int {
 			return i + 1
 
 		case Content:
+			switch root.Type {
+			case Root:
+				root.Value = append(root.Value, &Node{Type: Text, Text: token.Value})
 
-			if v, ok := root.(*NodeRoot); ok {
-				v.Values = append(v.Values, &NodeText{Text: token.Value})
-			} else if v, ok := root.(*NodeExpression); ok {
+			case Expression:
 				if sep {
-					v.Key = append(v.Value, v.Key...)
-					v.Value = []fmt.Stringer{&NodeText{Text: token.Value}}
+					root.Key = append(root.Value, root.Key...)
+					root.Value = []*Node{{Type: Text, Text: token.Value}}
 				} else {
-					v.Key = append(v.Key, &NodeText{Text: token.Value})
+					root.Key = append(root.Key, &Node{Type: Text, Text: token.Value})
 				}
-			} else {
+			default:
 				panic(fmt.Sprintf("invalid content node: %T", root))
 			}
 
