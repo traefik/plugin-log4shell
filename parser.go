@@ -46,7 +46,7 @@ func (n Node) String() string {
 	case Text:
 		return n.Text
 	default:
-		return "OOPS"
+		panic(fmt.Sprintf("not supported node type: %s", n.Type))
 	}
 }
 
