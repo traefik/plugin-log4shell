@@ -93,7 +93,7 @@ metadata:
 spec:
   plugin:
     log4shell:
-      errorCode: secretName
+      errorCode: 200
 
 ---
 apiVersion: traefik.containo.us/v1alpha1
@@ -131,7 +131,7 @@ kind: Ingress
 metadata:
   name: myingress
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: log4shell-foo@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-log4shell-foo@kubernetescrd
 
 spec:
   rules:
