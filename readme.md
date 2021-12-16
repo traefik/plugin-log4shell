@@ -13,7 +13,7 @@ Related to the Log4J CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-202
 ```bash
 --pilot.token=xxx
 --experimental.plugins.log4shell.modulename=github.com/traefik/plugin-log4shell
---experimental.plugins.log4shell.version=v0.1.1
+--experimental.plugins.log4shell.version=v0.1.2
 ```
 
 ```yaml
@@ -24,7 +24,7 @@ experimental:
   plugins:
     log4shell:
       modulename: github.com/traefik/plugin-log4shell
-      version: v0.1.1
+      version: v0.1.2
 ```
 
 ```toml
@@ -33,7 +33,7 @@ experimental:
 
 [experimental.plugins.log4shell]
     modulename = "github.com/traefik/plugin-log4shell"
-    version = "v0.1.1"
+    version = "v0.1.2"
 ```
 
 ### Dynamic
