@@ -2,6 +2,7 @@ displayName: Log4Shell
 type: middleware
 import: github.com/traefik/plugin-log4shell
 summary: Block Log4j exploit
+iconPath: .assets/icon.png
 
 testData:
   errorCode: 200
