@@ -24,7 +24,7 @@ experimental:
   plugins:
     log4shell:
       modulename: github.com/traefik/plugin-log4shell
-      version: v0.1.0
+      version: v0.1.1
 ```
 
 ```toml
@@ -33,7 +33,7 @@ experimental:
 
 [experimental.plugins.log4shell]
     modulename = "github.com/traefik/plugin-log4shell"
-    version = "v0.1.0"
+    version = "v0.1.1"
 ```
 
 ### Dynamic
