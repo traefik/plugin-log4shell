@@ -105,7 +105,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`whoami.example.com`)
+      match: Host(`whoami.localhost`)
       middlewares:
         - name: log4shell-foo
       services:
@@ -123,7 +123,7 @@ metadata:
 spec:
   plugin:
     log4shell:
-      errorCode: secretName
+      errorCode: 200
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -135,7 +135,7 @@ metadata:
 
 spec:
   rules:
-    - host: example.com
+    - host: whoami.localhost
       http:
         paths:
           - path: /
