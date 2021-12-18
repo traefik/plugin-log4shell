@@ -66,35 +66,39 @@ func (t Token) String() string {
 func Parse(value string) *Node {
 	root := &Node{Type: Root}
 
-	tree(root, tokenizer(value))
+	buildTree(root, tokenize(value))
 
 	return root
 }
 
-func tokenizer(value string) []*Token {
+func tokenize(value string) []*Token {
 	var tokens []*Token
 
 	var previous *Token
+	var open int
+	length := len(value)
 
-	for i := 0; i < len(value); i++ {
+	for i := 0; i < length; i++ {
 		v := value[i]
 		t := &Token{Pos: i}
 
 		switch {
-		case v == '$' && value[i+1] == '{':
+		case v == '$' && length > i+1 && value[i+1] == '{':
 			t.Type = Start
 			t.Value = "${"
 			i++
+			open++
 
-		case v == '}':
+		case v == '}' && open > 0:
 			t.Type = End
 			t.Value = "}"
+			open--
 
-		case v == ':':
+		case v == ':' && open > 0:
 			t.Type = Separator
 			t.Value = ":"
 
-			if value[i+1] == '-' {
+			if length > i+1 && value[i+1] == '-' {
 				t.Value = ":-"
 				i++
 			}
@@ -116,7 +120,7 @@ func tokenizer(value string) []*Token {
 	return tokens
 }
 
-func tree(root *Node, tokens []*Token) int {
+func buildTree(root *Node, tokens []*Token) int {
 	var sep bool
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
@@ -141,7 +145,7 @@ func tree(root *Node, tokens []*Token) int {
 				panic(fmt.Sprintf("invalid start node: %T", root))
 			}
 
-			j := tree(exp, tokens[i+1:])
+			j := buildTree(exp, tokens[i+1:])
 			if j < 0 {
 				return i
 			}

@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_tokenizer(t *testing.T) {
+func Test_tokenize(t *testing.T) {
 	testCases := []struct {
 		expression string
 		expected   []*Token
@@ -20,6 +20,24 @@ func Test_tokenizer(t *testing.T) {
 			},
 		},
 		{
+			expression: "${b:}",
+			expected: []*Token{
+				{Type: "START", Pos: 0, Value: "${"},
+				{Type: "CONTENT", Pos: 2, Value: "b"},
+				{Type: "SEP", Pos: 3, Value: ":"},
+				{Type: "END", Pos: 4, Value: "}"},
+			},
+		},
+		{
+			expression: "${:c}",
+			expected: []*Token{
+				{Type: "START", Pos: 0, Value: "${"},
+				{Type: "SEP", Pos: 2, Value: ":"},
+				{Type: "CONTENT", Pos: 3, Value: "c"},
+				{Type: "END", Pos: 4, Value: "}"},
+			},
+		},
+		{
 			expression: "a${b:c}d",
 			expected: []*Token{
 				{Type: "CONTENT", Pos: 0, Value: "a"},
@@ -29,6 +47,69 @@ func Test_tokenizer(t *testing.T) {
 				{Type: "CONTENT", Pos: 5, Value: "c"},
 				{Type: "END", Pos: 6, Value: "}"},
 				{Type: "CONTENT", Pos: 7, Value: "d"},
+			},
+		},
+		{
+			expression: "a${b:c}d}",
+			expected: []*Token{
+				{Type: "CONTENT", Pos: 0, Value: "a"},
+				{Type: "START", Pos: 1, Value: "${"},
+				{Type: "CONTENT", Pos: 3, Value: "b"},
+				{Type: "SEP", Pos: 4, Value: ":"},
+				{Type: "CONTENT", Pos: 5, Value: "c"},
+				{Type: "END", Pos: 6, Value: "}"},
+				{Type: "CONTENT", Pos: 7, Value: "d}"},
+			},
+		},
+		{
+			expression: "a${b:c}d:",
+			expected: []*Token{
+				{Type: "CONTENT", Pos: 0, Value: "a"},
+				{Type: "START", Pos: 1, Value: "${"},
+				{Type: "CONTENT", Pos: 3, Value: "b"},
+				{Type: "SEP", Pos: 4, Value: ":"},
+				{Type: "CONTENT", Pos: 5, Value: "c"},
+				{Type: "END", Pos: 6, Value: "}"},
+				{Type: "CONTENT", Pos: 7, Value: "d:"},
+			},
+		},
+		{
+			expression: "a${b:c}d${e:",
+			expected: []*Token{
+				{Type: "CONTENT", Pos: 0, Value: "a"},
+				{Type: "START", Pos: 1, Value: "${"},
+				{Type: "CONTENT", Pos: 3, Value: "b"},
+				{Type: "SEP", Pos: 4, Value: ":"},
+				{Type: "CONTENT", Pos: 5, Value: "c"},
+				{Type: "END", Pos: 6, Value: "}"},
+				{Type: "CONTENT", Pos: 7, Value: "d"},
+				{Type: "START", Pos: 8, Value: "${"},
+				{Type: "CONTENT", Pos: 10, Value: "e"},
+				{Type: "SEP", Pos: 11, Value: ":"},
+			},
+		},
+		{
+			expression: "a${b:c}d$",
+			expected: []*Token{
+				{Type: "CONTENT", Pos: 0, Value: "a"},
+				{Type: "START", Pos: 1, Value: "${"},
+				{Type: "CONTENT", Pos: 3, Value: "b"},
+				{Type: "SEP", Pos: 4, Value: ":"},
+				{Type: "CONTENT", Pos: 5, Value: "c"},
+				{Type: "END", Pos: 6, Value: "}"},
+				{Type: "CONTENT", Pos: 7, Value: "d$"},
+			},
+		},
+		{
+			expression: "a${b:c$}d",
+			expected: []*Token{
+				{Type: "CONTENT", Pos: 0, Value: "a"},
+				{Type: "START", Pos: 1, Value: "${"},
+				{Type: "CONTENT", Pos: 3, Value: "b"},
+				{Type: "SEP", Pos: 4, Value: ":"},
+				{Type: "CONTENT", Pos: 5, Value: "c$"},
+				{Type: "END", Pos: 7, Value: "}"},
+				{Type: "CONTENT", Pos: 8, Value: "d"},
 			},
 		},
 		{
@@ -134,7 +215,7 @@ func Test_tokenizer(t *testing.T) {
 	for _, test := range testCases {
 		test := test
 		t.Run(test.expression, func(t *testing.T) {
-			tokens := tokenizer(test.expression)
+			tokens := tokenize(test.expression)
 
 			if !equalsTokens(test.expected, tokens) {
 				t.Error("tokens parsing")
