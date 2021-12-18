@@ -80,8 +80,7 @@ func Test_containsJNDI(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			result := containsJNDI(test.value)
 			if result != test.expected {
-				t.Log(result)
-				t.Fail()
+				t.Errorf("got: %v, want: %v", result, test.expected)
 			}
 		})
 	}
@@ -110,6 +109,6 @@ func TestServeHTTP(t *testing.T) {
 	handler.ServeHTTP(recorder, req)
 
 	if recorder.Result().StatusCode != http.StatusOK {
-		t.Errorf("want %d, got %d", http.StatusOK, recorder.Result().StatusCode)
+		t.Errorf("got %d, want %d", recorder.Result().StatusCode, http.StatusOK)
 	}
 }
