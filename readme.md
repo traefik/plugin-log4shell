@@ -8,6 +8,8 @@ Related to the Log4J CVE: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-202
 
 ## Configuration
 
+Requirements: Traefik >= v2.5.5
+
 ### Static
 
 ```bash
